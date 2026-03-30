@@ -1,0 +1,90 @@
+version: '3.9'
+
+services:
+
+  # ---- MySQL Database ----
+  db:
+    image: mysql:8.0
+    container_name: blog-db
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: blog_db
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-rootpassword}
+      MYSQL_USER: ${MYSQL_USER:-bloguser}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-blogpassword}
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+    networks:
+      - blog-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD:-rootpassword}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  # ---- Spring Boot Application ----
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: blog-app
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/blog_db?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true&createDatabaseIfNotExist=true
+      SPRING_DATASOURCE_USERNAME: ${MYSQL_USER:-bloguser}
+      SPRING_DATASOURCE_PASSWORD: ${MYSQL_PASSWORD:-blogpassword}
+      APP_JWT_SECRET: ${JWT_SECRET:-YourSuperSecretJWTSigningKeyThatShouldBeAtLeast256BitsLongForHS256AlgorithmSecurity}
+      APP_JWT_EXPIRATION_MS: ${JWT_EXPIRATION_MS:-86400000}
+      APP_JWT_REFRESH_EXPIRATION_MS: ${JWT_REFRESH_EXPIRATION_MS:-604800000}
+      SPRING_MAIL_HOST: ${MAIL_HOST:-smtp.gmail.com}
+      SPRING_MAIL_PORT: ${MAIL_PORT:-587}
+      SPRING_MAIL_USERNAME: ${MAIL_USERNAME:-your-email@gmail.com}
+      SPRING_MAIL_PASSWORD: ${MAIL_PASSWORD:-your-app-password}
+      APP_MAIL_FROM: ${MAIL_FROM:-noreply@blogplatform.com}
+      APP_FRONTEND_URL: ${FRONTEND_URL:-http://localhost:3000}
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILE:-prod}
+    ports:
+      - "8080:8080"
+    volumes:
+      - uploads-data:/app/uploads
+      - logs-data:/app/logs
+    networks:
+      - blog-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/api/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+  # ---- Adminer (DB UI - dev only) ----
+  adminer:
+    image: adminer:latest
+    container_name: blog-adminer
+    restart: unless-stopped
+    depends_on:
+      - db
+    ports:
+      - "8081:8080"
+    networks:
+      - blog-network
+    profiles:
+      - dev
+
+volumes:
+  mysql-data:
+    driver: local
+  uploads-data:
+    driver: local
+  logs-data:
+    driver: local
+
+networks:
+  blog-network:
+    driver: bridge
