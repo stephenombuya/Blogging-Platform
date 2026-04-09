@@ -25,6 +25,21 @@ services:
       retries: 5
       start_period: 30s
 
+  # ---- Redis ----
+  redis:
+    image: redis:7-alpine
+    container_name: blog-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    networks:
+      - blog-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+
   # ---- Spring Boot Application ----
   app:
     build:
@@ -35,10 +50,14 @@ services:
     depends_on:
       db:
         condition: service_healthy
+      redis:
+        condition: service_healthy
     environment:
       SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/blog_db?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true&createDatabaseIfNotExist=true
       SPRING_DATASOURCE_USERNAME: ${MYSQL_USER:-bloguser}
       SPRING_DATASOURCE_PASSWORD: ${MYSQL_PASSWORD:-blogpassword}
+      SPRING_REDIS_HOST: redis
+      SPRING_REDIS_PORT: 6379
       APP_JWT_SECRET: ${JWT_SECRET:-YourSuperSecretJWTSigningKeyThatShouldBeAtLeast256BitsLongForHS256AlgorithmSecurity}
       APP_JWT_EXPIRATION_MS: ${JWT_EXPIRATION_MS:-86400000}
       APP_JWT_REFRESH_EXPIRATION_MS: ${JWT_REFRESH_EXPIRATION_MS:-604800000}
