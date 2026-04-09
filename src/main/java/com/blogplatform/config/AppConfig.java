@@ -12,4 +12,12 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 public class AppConfig {
     // Async, Scheduling, and Caching enabled via annotations.
     // Additional beans (thread pools, cache managers) can be configured here.
+    @Bean
+    public RedisTemplate<String, String> redisTemplate(RedisConnectionFactory f) {
+        RedisTemplate<String, String> t = new RedisTemplate<>();
+        t.setConnectionFactory(f);
+        t.setKeySerializer(new StringRedisSerializer());
+        t.setValueSerializer(new StringRedisSerializer());
+        return t;
+    }
 }
