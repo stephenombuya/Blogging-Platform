@@ -111,9 +111,12 @@ public class AuthService {
                 .build();
     }
 
-    public void logout(String token) {
-        refreshTokenRepository.findByToken(token)
-                .ifPresent(refreshTokenRepository::delete);
+    public void logout(String refreshToken, String accessToken) {
+        refreshTokenRepository.findByToken(refreshToken)
+            .ifPresent(refreshTokenRepository::delete);
+        if (accessToken != null) {
+            jwtUtil.blacklistToken(accessToken);
+        }
     }
 
     public void verifyEmail(String token) {
