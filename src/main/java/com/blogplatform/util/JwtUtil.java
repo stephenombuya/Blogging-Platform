@@ -13,6 +13,9 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+@Autowired
+private RedisTemplate<String, String> redisTemplate;
+
 @Slf4j
 @Component
 public class JwtUtil {
@@ -93,5 +96,20 @@ public class JwtUtil {
 
     public long getExpirationMs() {
         return jwtExpirationMs;
+    }
+
+    public void blacklistToken(String token) {
+        Date exp = extractExpiration(token);
+        long ttl = exp.getTime() - System.currentTimeMillis();
+        if (ttl > 0) {
+            redisTemplate.opsForValue()
+                .set("blacklist:" + token, "1",
+                     Duration.ofMillis(ttl));
+        }
+    }
+
+    public boolean isBlacklisted(String token) {
+        return Boolean.TRUE.equals(
+            redisTemplate.hasKey("blacklist:" + token));
     }
 }
