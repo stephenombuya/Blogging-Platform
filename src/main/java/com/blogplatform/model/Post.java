@@ -3,11 +3,16 @@ package com.blogplatform.model;
 import jakarta.persistence.*;
 import lombok.*;
 
+import org.hibernate.annotations.SQLRestriction;
+import org.hibernate.annotations.SQLDelete;
+
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
+@SQLDelete(sql = "UPDATE posts SET deleted_at = NOW() WHERE id = ?")
+@SQLRestriction("deleted_at IS NULL")
 @Table(name = "posts",
     indexes = {
         @Index(name = "idx_posts_author",    columnList = "author_id"),
@@ -72,6 +77,9 @@ public class Post {
 
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
+
+    @Column(name = "deleted_at")
+    private LocalDateTime deletedAt;
 
     @PrePersist
     protected void onCreate() {
