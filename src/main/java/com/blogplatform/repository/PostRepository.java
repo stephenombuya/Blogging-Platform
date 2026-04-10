@@ -55,6 +55,11 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     @Query("UPDATE Post p SET p.viewCount = p.viewCount + 1 WHERE p.id = :id")
     void incrementViewCount(@Param("id") Long id);
 
+    @Modifying
+    @Query(value = "UPDATE posts SET deleted_at = NULL WHERE id = :id",
+           nativeQuery = true)
+    void restorePost(@Param("id") Long id);
+
     @Query("SELECT p FROM Post p WHERE p.status = 'PUBLISHED' ORDER BY p.viewCount DESC")
     Page<Post> findMostViewed(Pageable pageable);
 
