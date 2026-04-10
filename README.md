@@ -1,4 +1,4 @@
-# 📝 Blogging Platform — Production-Ready Back-End
+#  Blogging Platform — Production-Ready Back-End
 
 A fully-featured, production-ready RESTful blogging platform built with **Java 17**, **Spring Boot 3**, **MySQL 8**, **Redis**, and **JWT authentication**.
 
