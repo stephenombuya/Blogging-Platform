@@ -223,6 +223,12 @@ public class PostService {
         return mapToDetail(postRepository.save(post), viewer);
     }
 
+    @Transactional
+    public void restorePost(Long id) {
+        // Must use native query to bypass @SQLRestriction:
+        postRepository.restorePost(id);
+    }
+    
     // ---- Mapping helpers ----
 
     public PostDto.Summary mapToSummary(Post post, User viewer) {
