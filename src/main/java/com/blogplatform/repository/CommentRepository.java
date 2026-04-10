@@ -14,7 +14,9 @@ import org.springframework.stereotype.Repository;
 public interface CommentRepository extends JpaRepository<Comment, Long> {
 
     // Top-level approved comments for a post (no parent)
-    Page<Comment> findByPostAndParentIsNullAndApprovedTrue(Post post, Pageable pageable);
+    @EntityGraph(attributePaths = {"author", "replies", "replies.author"})
+    Page<Comment> findByPostAndParentIsNullAndApprovedTrue(
+        Post post, Pageable pageable);
 
     // All top-level comments (for admin)
     Page<Comment> findByPostAndParentIsNull(Post post, Pageable pageable);
