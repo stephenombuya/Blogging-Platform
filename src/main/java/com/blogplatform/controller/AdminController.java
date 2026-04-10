@@ -86,6 +86,13 @@ public class AdminController {
         return ResponseEntity.ok(ApiResponse.success("User unlocked"));
     }
 
+    @PatchMapping("/posts/{id}/restore")
+    @Operation(summary = "Restore a soft-deleted post")
+    public ResponseEntity<ApiResponse<Void>> restorePost(@PathVariable Long id) {
+        postService.restorePost(id);
+        return ResponseEntity.ok(ApiResponse.success("Post restored"));
+    }
+
     @DeleteMapping("/users/{id}")
     @Operation(summary = "Delete any user account", security = @SecurityRequirement(name = "bearerAuth"))
     public ResponseEntity<ApiResponse<Void>> deleteUser(@PathVariable Long id) {
