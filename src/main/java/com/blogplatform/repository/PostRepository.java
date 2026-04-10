@@ -16,12 +16,15 @@ import java.util.Optional;
 @Repository
 public interface PostRepository extends JpaRepository<Post, Long> {
 
+    @EntityGraph(attributePaths = {"author", "category", "tags"})
     Optional<Post> findBySlug(String slug);
 
     boolean existsBySlug(String slug);
 
+    @EntityGraph(attributePaths = {"author", "category", "tags"})
     Page<Post> findByStatus(Post.Status status, Pageable pageable);
 
+    @EntityGraph(attributePaths = {"author", "category", "tags"})
     Page<Post> findByAuthorAndStatus(User author, Post.Status status, Pageable pageable);
 
     Page<Post> findByAuthor(User author, Pageable pageable);
