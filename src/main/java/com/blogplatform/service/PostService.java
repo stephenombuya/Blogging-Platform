@@ -24,6 +24,7 @@ public class PostService {
     private final PostRepository     postRepository;
     private final CategoryRepository categoryRepository;
     private final CommentRepository  commentRepository;
+    private final UserRepository     userRepository;
     private final UserService        userService;
     private final TagService         tagService;
     private final LikeService        likeService;
@@ -288,12 +289,9 @@ public class PostService {
     }
 
     private User findUserByUsername(String username) {
-        // Inline lookup to avoid circular dependency
-        return postRepository.findAll().stream()
-                .map(Post::getAuthor)
-                .filter(u -> u.getUsername().equals(username))
-                .findFirst()
-                .orElseThrow(() -> new ResourceNotFoundException("User", "username", username));
+        return userRepository.findByUsername(username)
+            .orElseThrow(() -> new ResourceNotFoundException(
+                "User", "username", username));
     }
 
     private User currentUser() {
