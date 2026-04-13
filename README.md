@@ -2,7 +2,16 @@
 
 A fully-featured, production-ready RESTful blogging platform built with **Java 17**, **Spring Boot 3**, **MySQL 8**, **Redis**, and **JWT authentication**.
 
----
+<div>
+
+  <!-- Repository Analytics -->
+![GitHub repo size](https://img.shields.io/github/repo-size/stephenombuya/Blogging-Platform)
+![GitHub language count](https://img.shields.io/github/languages/count/stephenombuya/Blogging-Platform)
+![GitHub top language](https://img.shields.io/github/languages/top/stephenombuya/Blogging-Platform)
+![GitHub last commit](https://img.shields.io/github/last-commit/stephenombuya/Blogging-Platform)
+![GitHub contributors](https://img.shields.io/github/contributors/stephenombuya/Blogging-Platform)
+
+</div>
 
 ##  Architecture
 
@@ -410,6 +419,6 @@ Please make sure all tests pass (`mvn test`) before submitting.
 
 ---
 
-## 📄 License
+##  License
 
 MIT License — see [LICENSE](LICENSE) for details.
